@@ -58,6 +58,8 @@ while True:
         
         first_line = first_line.strip().decode()
         parts = first_line.split()
+        if not parts:
+            continue
         command = parts[0].upper()
         
         if command == "SET":
