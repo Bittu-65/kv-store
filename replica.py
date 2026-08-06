@@ -38,7 +38,7 @@ def write_wal(key, command):
         index[key] = pos
 
 replica = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-replica.bind(('127.0.0.1', 5001))  # different port from primary
+replica.bind(('0.0.0.0', 5001))  # listen on all network interfaces
 replica.listen(1)
 
 replay_wal()
