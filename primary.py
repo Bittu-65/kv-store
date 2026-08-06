@@ -2,6 +2,7 @@ import socket
 import os
 import threading
 import time
+import argparse
 
 # --- ADDED: structured logging for LogLens ---
 from kvlogger import log_event, Timer
@@ -21,12 +22,17 @@ server.listen(1)
 
 storage = {}
 index = {}
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--replica', default='127.0.0.1', help='Replica IP address')
+args = parser.parse_args()
+
 # connect to replica at startup
 replica_conn = None
 try:
     replica_conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    replica_conn.connect(('127.0.0.1', 5001))
-    print("Connected to replica on port 5001")
+    replica_conn.connect((args.replica, 5001))
+    print(f"Connected to replica on {args.replica}:5001")
 except ConnectionRefusedError:
     print("Replica not available — running without replication")
     replica_conn = None
