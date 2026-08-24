@@ -106,3 +106,28 @@ kv-store/
 - **Single client at a time** — no concurrency (no threading or async). Adding gevent or asyncio is a planned next step.
 - **Read scaling** — all reads go to primary. Routing reads to replica is a known next step for scaling.
 
+## Running with Docker
+
+The easiest way to run the full primary-replica setup locally:
+
+\`\`\`bash
+docker-compose up -d
+\`\`\`
+
+This builds and starts both nodes:
+- **primary** — listens on port 5000, connects to replica on startup
+- **replica** — listens on port 5001, receives replicated writes from primary
+
+Check logs:
+\`\`\`bash
+docker logs primary
+docker logs replica
+\`\`\`
+
+Stop everything:
+\`\`\`bash
+docker-compose down
+\`\`\`
+
+### Architecture note
+Both nodes run from the same image — role is controlled via the `ROLE` environment variable (`primary` or `replica`), read in the Dockerfile's `CMD`. This mirrors how the same codebase is deployed differently per node in the AWS EC2 setup, just containerized instead of running directly on the host.
