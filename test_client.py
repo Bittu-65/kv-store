@@ -1,24 +1,33 @@
 import socket
 
-def send_command(sock, line):
-    sock.send((line + "\n").encode())
-    print(">>>", line)
+def send_and_recv(sock, data):
+    sock.send(data)
+    return sock.recv(1024).decode().strip()
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect(('127.0.0.1', 5000))
+def main():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect(('127.0.0.1', 5000))
 
-# SET foo bar
-value = "bar"
-send_command(sock, f"SET foo {len(value)}")
-sock.send((value + "\n").encode())
-print("<<<", sock.recv(1024).decode())
+    # SET
+    resp = send_and_recv(sock, b"SET foo 3\n")
+    resp2 = send_and_recv(sock, b"bar\n")
+    assert resp2 == "OK", f"SET failed: expected 'OK', got '{resp2}'"
 
-# GET foo
-send_command(sock, "GET foo")
-print("<<<", sock.recv(1024).decode())
+    # GET
+    resp = send_and_recv(sock, b"GET foo\n")
+    assert resp == "bar", f"GET mismatch: expected 'bar', got '{resp}'"
 
-# DELETE foo
-send_command(sock, "DELETE foo")
-print("<<<", sock.recv(1024).decode())
+    # DELETE
+    resp = send_and_recv(sock, b"DELETE foo\n")
+    assert resp == "Deleted", f"DELETE failed: expected 'Deleted', got '{resp}'"
 
-sock.close()
+    # GET after delete — confirm it's actually gone
+    resp = send_and_recv(sock, b"GET foo\n")
+    assert resp != "bar", f"Expected foo to be deleted, but GET still returned 'bar'"
+
+    sock.close()
+    print("All tests passed!")
+
+if __name__ == "__main__":
+    main()
+    
