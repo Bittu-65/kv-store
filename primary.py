@@ -2,7 +2,6 @@ import socket
 import os
 import threading
 import time
-import argparse
 
 # --- ADDED: structured logging for LogLens ---
 from kvlogger import log_event, Timer
@@ -13,26 +12,24 @@ REPLICA_TARGETS = ["replica-1"]
 HEARTBEAT_INTERVAL_SEC = 2
 # --- END ADDED ---
 
-WAL_FILE = "/opt/kvstore/data/wal.log"
+PORT = int(os.environ.get("PORT", 5000))
+REPLICA_HOST = os.environ.get("REPLICA_HOST", "127.0.0.1")
+REPLICA_PORT = int(os.environ.get("REPLICA_PORT", 5001))
+WAL_FILE = os.environ.get("WAL_FILE", "/opt/kvstore/data/wal.log")
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server.bind(('0.0.0.0', 5000))
+server.bind(('0.0.0.0', PORT))
 server.listen(1)
 
 storage = {}
 index = {}
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--replica', default='127.0.0.1', help='Replica IP address')
-args = parser.parse_args()
-
 # connect to replica at startup
 replica_conn = None
 try:
     replica_conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    replica_conn.connect((args.replica, 5001))
-    print(f"Connected to replica on {args.replica}:5001")
+    replica_conn.connect((REPLICA_HOST, REPLICA_PORT))
+    print(f"Connected to replica on {REPLICA_HOST}:{REPLICA_PORT}")
 except ConnectionRefusedError:
     print("Replica not available — running without replication")
     replica_conn = None

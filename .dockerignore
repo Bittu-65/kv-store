@@ -1,0 +1,4 @@
+__pycache__/
+*.pem
+*.log
+data.txt

@@ -1,7 +1,7 @@
 import socket
 import os
 
-WAL_FILE = "/opt/kvstore/data/replica_wal.log"  # separate WAL from primary's
+WAL_FILE = os.environ.get("WAL_FILE", "/opt/kvstore/data/replica_wal.log")  # separate WAL from primary's
 
 storage = {}
 index = {}
@@ -37,12 +37,14 @@ def write_wal(key, command):
         f.write(command + "\n")
         index[key] = pos
 
+PORT = int(os.environ.get("PORT", 5001))
+
 replica = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-replica.bind(('0.0.0.0', 5001))  # listen on all network interfaces
+replica.bind(('0.0.0.0', PORT))
 replica.listen(1)
 
 replay_wal()
-print("Replica listening on port 5001...")
+print(f"Replica listening on port {PORT}...")
 
 while True:
     conn, address = replica.accept()
@@ -58,8 +60,6 @@ while True:
         
         first_line = first_line.strip().decode()
         parts = first_line.split()
-        if not parts:
-            continue
         command = parts[0].upper()
         
         if command == "SET":

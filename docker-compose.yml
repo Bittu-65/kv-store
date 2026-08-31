@@ -1,0 +1,22 @@
+services:
+  replica:
+    build: .
+    container_name: replica
+    environment:
+      - ROLE=replica
+      - PORT=5001
+    ports:
+      - "5001:5001"
+
+  primary:
+    build: .
+    container_name: primary
+    environment:
+      - ROLE=primary
+      - PORT=5000
+      - REPLICA_HOST=replica
+      - REPLICA_PORT=5001
+    ports:
+      - "5000:5000"
+    depends_on:
+      - replica
