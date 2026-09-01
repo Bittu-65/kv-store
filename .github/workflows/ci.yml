@@ -18,14 +18,12 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Start KV store server
+      - name: Start server and run tests
         run: |
           python primary.py &
           sleep 2
-
-      - name: Run tests
-        run: |
           python test_client.py
+      
 
   build-and-push:
     needs: test
