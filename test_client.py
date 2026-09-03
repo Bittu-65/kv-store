@@ -7,6 +7,7 @@ def send_and_recv(sock, data):
 def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(('127.0.0.1', 5000))
+    sock.settimeout(5)
 
     # SET
     resp = send_and_recv(sock, b"SET foo 3\n")
