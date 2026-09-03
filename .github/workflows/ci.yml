@@ -20,7 +20,7 @@ jobs:
 
       - name: Start server and run tests
         run: |
-          python primary.py > server.log 2>&1 &
+          python -u primary.py > server.log 2>&1 &
           sleep 3
           cat server.log
           python test_client.py
