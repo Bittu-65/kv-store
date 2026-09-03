@@ -19,6 +19,8 @@ jobs:
           python-version: '3.11'
 
       - name: Start server and run tests
+        env:
+          WAL_FILE: ./wal.log
         run: |
           python -u primary.py > server.log 2>&1 &
           sleep 3
